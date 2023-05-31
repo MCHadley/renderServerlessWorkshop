@@ -1,0 +1,33 @@
+service: renderServerlessWorkshop
+frameworkVersion: "3"
+
+custom:
+  tableName: "URLShortener"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ShortenerTable, Arn]
+  environment:
+    SHORTENER_TABLE: ${self:custom.tableName}
+
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi: "*"
+
+plugins:
+  - serverless-offline
